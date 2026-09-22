@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿斯凯的词 · Умный тренажёр Аскара</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2ea; --card:#fffdf8; --ink:#241f1a; --soft:#6d6459;
+  --jade:#2f8f6a; --jade-d:#1f6b4e; --jade-l:#e2f2ea;
+  --cin:#c04a35; --cin-l:#fbe8e3;
+  --gold:#d99a2b; --gold-l:#fdf1d9;
+  --ink-blue:#3a6fa8; --blue-l:#e4eefa;
+  --mom:#7a6bb5; --mom-l:#eee9f8;
+  --line:#e3dccd;
+  --sh:0 3px 14px rgba(70,60,40,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;line-height:1.5;padding:0 12px 70px}
+.zh{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif}
+.wrap{max-width:720px;margin:0 auto}
+
+header{text-align:center;padding:26px 0 12px;position:relative}
+header .p{font-size:2.8rem;line-height:1}
+header h1{font-family:'Noto Sans SC',sans-serif;font-size:1.8rem;color:var(--jade-d);letter-spacing:.06em;margin-top:2px}
+header .py{color:var(--gold);font-weight:800;font-size:.92rem;letter-spacing:.1em}
+header h2{font-size:1.25rem;margin-top:6px}
+header p{color:var(--soft);font-size:.92rem;margin-top:6px}
+
+/* прогресс-полоса */
+.stats{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh)}
+.bar{height:16px;border-radius:10px;background:#e8e2d5;overflow:hidden;display:flex;margin-bottom:9px}
+.bar i{display:block;height:100%}
+.bar .b3{background:var(--jade)}
+.bar .b2{background:var(--gold)}
+.bar .b1{background:var(--cin)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.82rem;font-weight:800}
+.legend span{display:flex;align-items:center;gap:5px;color:var(--soft)}
+.legend i{width:11px;height:11px;border-radius:50%;display:block}
+.tot{text-align:center;font-weight:900;font-size:1.05rem;margin-bottom:8px}
+.tot b{color:var(--jade-d)}
+
+/* мама */
+.momtop{background:var(--mom-l);border:2px solid #cfc4ea;border-radius:20px;padding:16px 18px;margin-bottom:16px}
+.momtop h3{color:var(--mom);font-size:1rem;margin-bottom:8px}
+.momtop ol{margin-left:18px;font-size:.92rem}
+.momtop li{margin-bottom:6px}
+details.mom{background:var(--mom-l);border:2px solid #cfc4ea;border-radius:16px;margin-top:14px;overflow:hidden}
+details.mom summary{cursor:pointer;padding:11px 15px;font-weight:800;color:var(--mom);font-size:.9rem;list-style:none}
+details.mom summary::-webkit-details-marker{display:none}
+details.mom summary::before{content:"▸ "}
+details.mom[open] summary::before{content:"▾ "}
+details.mom .in{padding:0 15px 14px;font-size:.9rem;color:#3f3a52}
+details.mom .in p{margin-bottom:8px}
+
+/* режимы */
+.modes{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.mode{border:2px solid var(--line);background:var(--card);border-radius:15px;padding:9px 12px;cursor:pointer;
+  font-family:inherit;font-weight:800;font-size:.85rem;color:var(--soft);white-space:nowrap;flex-shrink:0;text-align:center}
+.mode .ic{display:block;font-size:1.15rem}
+.mode.on{background:var(--jade);border-color:var(--jade);color:#fff}
+
+.box{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px 16px;margin-bottom:16px;box-shadow:var(--sh)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:2px solid var(--line);background:var(--bg);border-radius:20px;padding:5px 11px;cursor:pointer;
+  font-family:inherit;font-weight:800;font-size:.78rem;color:var(--soft)}
+.chip.on{background:var(--ink-blue);border-color:var(--ink-blue);color:#fff}
+.chip .n{opacity:.7;font-size:.72rem;margin-left:3px}
+
+/* карточка слова */
+.word{background:var(--jade-l);border:3px solid var(--jade);border-radius:24px;padding:22px 16px;text-align:center;position:relative}
+.word .hz{font-family:'Noto Sans SC',sans-serif;font-size:3.4rem;font-weight:900;line-height:1.1;color:var(--jade-d)}
+.word .pn{font-size:1.3rem;font-weight:900;color:var(--gold);margin-top:2px}
+.word .tr{font-size:1.05rem;font-weight:800;color:var(--mom)}
+.word .ru{font-size:1.15rem;font-weight:800;margin-top:6px}
+.word .hint{font-size:.85rem;color:var(--soft);margin-top:6px}
+.word .lvl{position:absolute;top:10px;right:12px;font-size:.75rem;font-weight:900;color:var(--soft)}
+.big{width:100%;border:none;border-radius:20px;background:var(--gold);color:#fff;font-family:inherit;font-weight:900;
+  font-size:1.5rem;padding:20px;cursor:pointer;box-shadow:0 5px 0 #b47f16;margin:14px 0}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #b47f16}
+.big.jade{background:var(--jade);box-shadow:0 5px 0 var(--jade-d)}
+.big.blue{background:var(--ink-blue);box-shadow:0 5px 0 #27568a}
+
+.row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.btn{border:none;border-radius:15px;padding:12px 16px;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer;
+  background:var(--jade);color:#fff;box-shadow:0 4px 0 var(--jade-d);flex:1;min-width:120px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--jade-d)}
+.btn.red{background:var(--cin);box-shadow:0 4px 0 #8f3626}
+.btn.gold{background:var(--gold);box-shadow:0 4px 0 #b47f16}
+.btn.ghost{background:var(--card);color:var(--jade-d);border:2px solid var(--jade);box-shadow:0 3px 0 var(--line)}
+
+/* варианты */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.opt{border:3px solid var(--line);background:var(--bg);border-radius:18px;padding:14px 8px;cursor:pointer;
+  font-family:inherit;text-align:center;position:relative;transition:.12s}
+.opt:active{transform:scale(.96)}
+.opt .hz{font-family:'Noto Sans SC',sans-serif;font-size:1.5rem;font-weight:700;display:block}
+.opt .pn{font-size:1rem;color:var(--gold);font-weight:900;display:block}
+.opt .tr{font-size:.82rem;color:var(--mom);font-weight:700;display:block}
+.opt .ru{font-size:1rem;font-weight:800;display:block}
+.opt.ok{border-color:var(--jade);background:var(--jade-l)}
+.opt.no{border-color:var(--cin);background:var(--cin-l);opacity:.65}
+.spk{position:absolute;top:4px;right:4px;background:var(--gold-l);border:none;border-radius:8px;width:27px;height:27px;cursor:pointer;font-size:.82rem}
+.spk:hover{background:var(--gold);color:#fff}
+
+.msg{text-align:center;font-weight:800;font-size:1rem;min-height:26px;margin-top:12px}
+.msg.good{color:var(--jade-d)}
+.msg.bad{color:var(--cin)}
+.sub{color:var(--soft);font-size:.9rem;margin-bottom:12px}
+.h{font-size:1.05rem;color:var(--jade-d);margin-bottom:4px;font-weight:900}
+
+/* список слов */
+.list{display:grid;gap:8px;max-height:460px;overflow-y:auto;padding-right:4px}
+.li{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;padding:9px 11px;background:var(--bg)}
+.li .hz{font-family:'Noto Sans SC',sans-serif;font-size:1.5rem;font-weight:700;min-width:64px}
+.li .mid{flex:1;min-width:0}
+.li .pn{color:var(--gold);font-weight:900;font-size:.95rem}
+.li .tr{color:var(--mom);font-weight:700;font-size:.82rem}
+.li .ru{font-size:.9rem;font-weight:700;color:var(--ink)}
+.li .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.li button{background:var(--gold-l);border:none;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:1rem;flex-shrink:0}
+
+.done{background:linear-gradient(135deg,var(--jade-d),var(--jade));color:#fff;border-radius:22px;padding:26px;text-align:center}
+.done .big2{font-size:2.6rem}
+.done h3{font-size:1.25rem;margin:6px 0}
+.streak{text-align:center;font-weight:900;color:var(--gold);font-size:1.05rem;margin-top:8px}
+
+footer{text-align:center;color:var(--soft);font-size:.85rem;margin-top:22px}
+footer .zh{color:var(--jade);font-size:1.2rem;display:block}
+.warn{display:none;background:var(--gold-l);border:2px solid #f0d79b;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:.9rem;color:#7a5a12}
+.warn.show{display:block}
+.conf{position:fixed;inset:0;pointer-events:none;z-index:60}
+.conf i{position:absolute;width:10px;height:14px;border-radius:2px;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="p">🐼</div>
+    <h1 class="zh">阿斯凯的词</h1>
+    <div class="py">Āsīkǎi de cí</div>
+    <h2>Умный тренажёр Аскара</h2>
+    <p>Все слова, которые ты выучил. Тренажёр сам показывает то, что забывается.</p>
+  </header>
+
+  <div class="warn" id="warn">
+    🔇 Китайский голос не найден — слова не будут звучать. Откройте в браузере <b>Chrome</b> или <b>Edge</b> на компьютере.
+  </div>
+
+  <div class="stats">
+    <div class="tot" id="tot"></div>
+    <div class="bar"><i class="b3" id="b3"></i><i class="b2" id="b2"></i><i class="b1" id="b1"></i></div>
+    <div class="legend">
+      <span><i style="background:var(--jade)"></i>Знаю отлично</span>
+      <span><i style="background:var(--gold)"></i>Почти выучил</span>
+      <span><i style="background:var(--cin)"></i>Надо повторить</span>
+    </div>
+    <div class="streak" id="streak"></div>
+  </div>
+
+  <div class="momtop">
+    <h3>👩 Мама, как это работает</h3>
+    <ol>
+      <li><b>Тренажёр умный:</b> он запоминает, какие слова Аскар знает, а какие путает, и <b>сам чаще показывает трудные</b>. Слово уходит в зелёную зону только после трёх верных ответов подряд.</li>
+      <li><b>Под каждым иероглифом — пиньинь и русская транскрипция.</b> Китайский знать не нужно: читайте «мэнь-цзян» и всё получится.</li>
+      <li><b>🔊 есть у каждого слова и каждого варианта ответа.</b> Аскар должен выбирать на слух — он ещё не читает иероглифы.</li>
+      <li><b>Главное правило: сказал вслух — значит выучил.</b> Нажатие само по себе почти бесполезно.</li>
+      <li>10 минут в день лучше, чем час раз в неделю. Прогресс сохранится, пока страница открыта.</li>
+    </ol>
+  </div>
+
+  <div class="modes" id="modes"></div>
+
+  <div id="pane"></div>
+
+  <footer>
+    <span class="zh">加油！💪</span>
+    Все слова из уроков · абонементы №1 и №2
+  </footer>
+</div>
+
+<script>
+/* ============== СЛОВАРЬ ============== */
+/* t — тема, zh, py — пиньинь, tr — русский звук, ru — перевод */
+var W = [
+ /* числа */
+ {t:'Числа',zh:'一',py:'yī',tr:'и',ru:'один'},
+ {t:'Числа',zh:'二',py:'èr',tr:'эр',ru:'два (при счёте)'},
+ {t:'Числа',zh:'三',py:'sān',tr:'сань',ru:'три'},
+ {t:'Числа',zh:'四',py:'sì',tr:'сы',ru:'четыре'},
+ {t:'Числа',zh:'五',py:'wǔ',tr:'у',ru:'пять'},
+ {t:'Числа',zh:'六',py:'liù',tr:'лиу',ru:'шесть'},
+ {t:'Числа',zh:'七',py:'qī',tr:'ци',ru:'семь'},
+ {t:'Числа',zh:'八',py:'bā',tr:'ба',ru:'восемь'},
+ {t:'Числа',zh:'九',py:'jiǔ',tr:'цзиу',ru:'девять'},
+ {t:'Числа',zh:'十',py:'shí',tr:'ши',ru:'десять'},
+ {t:'Числа',zh:'十二',py:'shí\'èr',tr:'ши-эр',ru:'двенадцать'},
+ {t:'Числа',zh:'十八',py:'shíbā',tr:'ши-ба',ru:'восемнадцать'},
+ {t:'Числа',zh:'百',py:'bǎi',tr:'бай',ru:'сто'},
+ {t:'Числа',zh:'两',py:'liǎng',tr:'лян',ru:'два (людей, предметов)'},
+ {t:'Числа',zh:'零',py:'líng',tr:'лин',ru:'ноль'},
+ /* приветствия */
+ {t:'Приветствия',zh:'你好',py:'nǐ hǎo',tr:'ни хао',ru:'привет'},
+ {t:'Приветствия',zh:'您好',py:'nín hǎo',tr:'нинь хао',ru:'здравствуйте'},
+ {t:'Приветствия',zh:'再见',py:'zàijiàn',tr:'цзай-цзянь',ru:'до свидания'},
+ {t:'Приветствия',zh:'谢谢',py:'xièxie',tr:'се-се',ru:'спасибо'},
+ {t:'Приветствия',zh:'对不起',py:'duìbuqǐ',tr:'дуй-бу-ци',ru:'извини'},
+ {t:'Приветствия',zh:'没关系',py:'méiguānxi',tr:'мэй-гуань-си',ru:'ничего страшного'},
+ {t:'Приветствия',zh:'加油',py:'jiāyóu',tr:'цзя-йоу',ru:'давай! вперёд!'},
+ {t:'Приветствия',zh:'太棒了',py:'tài bàng le',tr:'тай бан лэ',ru:'класс! отлично!'},
+ /* о себе */
+ {t:'О себе',zh:'我',py:'wǒ',tr:'во',ru:'я'},
+ {t:'О себе',zh:'你',py:'nǐ',tr:'ни',ru:'ты'},
+ {t:'О себе',zh:'他',py:'tā',tr:'та',ru:'он'},
+ {t:'О себе',zh:'她',py:'tā',tr:'та',ru:'она'},
+ {t:'О себе',zh:'我们',py:'wǒmen',tr:'во-мэнь',ru:'мы'},
+ {t:'О себе',zh:'叫',py:'jiào',tr:'цзяо',ru:'зваться'},
+ {t:'О себе',zh:'名字',py:'míngzi',tr:'мин-цзы',ru:'имя'},
+ {t:'О себе',zh:'是',py:'shì',tr:'ши',ru:'быть, являться'},
+ {t:'О себе',zh:'谁',py:'shéi',tr:'шэй',ru:'кто'},
+ {t:'О себе',zh:'这',py:'zhè',tr:'чжэ',ru:'этот'},
+ {t:'О себе',zh:'那',py:'nà',tr:'на',ru:'тот'},
+ {t:'О себе',zh:'个',py:'gè',tr:'гэ',ru:'счётное слово'},
+ {t:'О себе',zh:'大',py:'dà',tr:'да',ru:'большой'},
+ {t:'О себе',zh:'小',py:'xiǎo',tr:'сяо',ru:'маленький'},
+ /* возраст и даты */
+ {t:'Возраст и даты',zh:'岁',py:'suì',tr:'суй',ru:'лет (возраст)'},
+ {t:'Возраст и даты',zh:'几岁',py:'jǐ suì',tr:'цзи суй',ru:'сколько лет'},
+ {t:'Возраст и даты',zh:'今年',py:'jīnnián',tr:'цзинь-нянь',ru:'в этом году'},
+ {t:'Возраст и даты',zh:'生日',py:'shēngrì',tr:'шэн-жи',ru:'день рождения'},
+ {t:'Возраст и даты',zh:'生日快乐',py:'shēngrì kuàilè',tr:'шэн-жи куай-лэ',ru:'с днём рождения!'},
+ {t:'Возраст и даты',zh:'今天',py:'jīntiān',tr:'цзинь-тянь',ru:'сегодня'},
+ {t:'Возраст и даты',zh:'昨天',py:'zuótiān',tr:'цзо-тянь',ru:'вчера'},
+ {t:'Возраст и даты',zh:'明天',py:'míngtiān',tr:'мин-тянь',ru:'завтра'},
+ {t:'Возраст и даты',zh:'年',py:'nián',tr:'нянь',ru:'год'},
+ {t:'Возраст и даты',zh:'号',py:'hào',tr:'хао',ru:'число, номер'},
+ {t:'Возраст и даты',zh:'星期',py:'xīngqī',tr:'син-ци',ru:'неделя'},
+ {t:'Возраст и даты',zh:'星期天',py:'xīngqī tiān',tr:'син-ци тянь',ru:'воскресенье'},
+ /* семья */
+ {t:'Семья',zh:'爸爸',py:'bàba',tr:'ба-ба',ru:'папа'},
+ {t:'Семья',zh:'妈妈',py:'māma',tr:'ма-ма',ru:'мама'},
+ {t:'Семья',zh:'哥哥',py:'gēge',tr:'гэ-гэ',ru:'старший брат'},
+ {t:'Семья',zh:'弟弟',py:'dìdi',tr:'ди-ди',ru:'младший брат'},
+ {t:'Семья',zh:'姐姐',py:'jiějie',tr:'цзе-цзе',ru:'старшая сестра'},
+ {t:'Семья',zh:'妹妹',py:'mèimei',tr:'мэй-мэй',ru:'младшая сестра'},
+ {t:'Семья',zh:'爷爷',py:'yéye',tr:'е-е',ru:'дедушка (папа папы)'},
+ {t:'Семья',zh:'外公',py:'wàigōng',tr:'вай-гун',ru:'дедушка (папа мамы)'},
+ {t:'Семья',zh:'叔叔',py:'shūshu',tr:'шу-шу',ru:'дядя'},
+ {t:'Семья',zh:'大人',py:'dàrén',tr:'да-жэнь',ru:'взрослый'},
+ {t:'Семья',zh:'家',py:'jiā',tr:'цзя',ru:'дом, семья'},
+ {t:'Семья',zh:'人',py:'rén',tr:'жэнь',ru:'человек'},
+ {t:'Семья',zh:'口',py:'kǒu',tr:'коу',ru:'счётное слово (людей в семье)'},
+ {t:'Семья',zh:'有',py:'yǒu',tr:'йоу',ru:'есть, иметь'},
+ {t:'Семья',zh:'没有',py:'méiyǒu',tr:'мэй-йоу',ru:'нет, не иметь'},
+ {t:'Семья',zh:'和',py:'hé',tr:'хэ',ru:'и'},
+ {t:'Семья',zh:'几',py:'jǐ',tr:'цзи',ru:'сколько'},
+ /* футбол */
+ {t:'Футбол',zh:'足球',py:'zúqiú',tr:'цзу-цю',ru:'футбол'},
+ {t:'Футбол',zh:'球',py:'qiú',tr:'цю',ru:'мяч'},
+ {t:'Футбол',zh:'球门',py:'qiúmén',tr:'цю-мэнь',ru:'ворота'},
+ {t:'Футбол',zh:'门将',py:'ménjiàng',tr:'мэнь-цзян',ru:'вратарь'},
+ {t:'Футбол',zh:'球员',py:'qiúyuán',tr:'цю-юань',ru:'игрок'},
+ {t:'Футбол',zh:'队',py:'duì',tr:'дуй',ru:'команда'},
+ {t:'Футбол',zh:'进球',py:'jìnqiú',tr:'цзинь-цю',ru:'гол'},
+ {t:'Футбол',zh:'赢',py:'yíng',tr:'ин',ru:'выиграть'},
+ {t:'Футбол',zh:'喜欢',py:'xǐhuan',tr:'си-хуань',ru:'нравиться'},
+ /* города и страны */
+ {t:'Города и страны',zh:'中国',py:'Zhōngguó',tr:'чжун-го',ru:'Китай'},
+ {t:'Города и страны',zh:'俄罗斯',py:'Éluósī',tr:'э-ло-сы',ru:'Россия'},
+ {t:'Города и страны',zh:'哈萨克斯坦',py:'Hāsàkèsītǎn',tr:'ха-са-кэ-сы-тань',ru:'Казахстан'},
+ {t:'Города и страны',zh:'日本',py:'Rìběn',tr:'жи-бэнь',ru:'Япония'},
+ {t:'Города и страны',zh:'西班牙',py:'Xībānyá',tr:'си-бань-я',ru:'Испания'},
+ {t:'Города и страны',zh:'葡萄牙',py:'Pútáoyá',tr:'пу-тао-я',ru:'Португалия'},
+ {t:'Города и страны',zh:'阿根廷',py:'Āgēntíng',tr:'а-гэнь-тин',ru:'Аргентина'},
+ {t:'Города и страны',zh:'英国',py:'Yīngguó',tr:'ин-го',ru:'Англия'},
+ {t:'Города и страны',zh:'巴西',py:'Bāxī',tr:'ба-си',ru:'Бразилия'},
+ {t:'Города и страны',zh:'法国',py:'Fǎguó',tr:'фа-го',ru:'Франция'},
+ {t:'Города и страны',zh:'阿斯塔纳',py:'Āsītǎnà',tr:'а-сы-та-на',ru:'Астана'},
+ {t:'Города и страны',zh:'北京',py:'Běijīng',tr:'бэй-цзин',ru:'Пекин'},
+ {t:'Города и страны',zh:'上海',py:'Shànghǎi',tr:'шан-хай',ru:'Шанхай'},
+ {t:'Города и страны',zh:'莫斯科',py:'Mòsīkē',tr:'мо-сы-кэ',ru:'Москва'},
+ {t:'Города и страны',zh:'伦敦',py:'Lúndūn',tr:'лунь-дунь',ru:'Лондон'},
+ {t:'Города и страны',zh:'柏林',py:'Bólín',tr:'бо-линь',ru:'Берлин'},
+ {t:'Города и страны',zh:'旧金山',py:'Jiùjīnshān',tr:'цзиу-цзинь-шань',ru:'Сан-Франциско'},
+ {t:'Города и страны',zh:'住',py:'zhù',tr:'чжу',ru:'жить'},
+ {t:'Города и страны',zh:'哪儿',py:'nǎr',tr:'нар',ru:'где'},
+ /* достопримечательности */
+ {t:'Места',zh:'长城',py:'Chángchéng',tr:'чан-чэн',ru:'Великая стена'},
+ {t:'Места',zh:'天坛',py:'Tiāntán',tr:'тянь-тань',ru:'Храм Неба'},
+ {t:'Места',zh:'塔桥',py:'Tǎqiáo',tr:'та-цяо',ru:'Тауэрский мост'},
+ {t:'Места',zh:'金门大桥',py:'Jīnmén Dàqiáo',tr:'цзинь-мэнь да-цяо',ru:'мост Золотые Ворота'},
+ {t:'Места',zh:'拜特列克',py:'Bàitèlièkè',tr:'бай-тэ-ле-кэ',ru:'Байтерек 🇰🇿'},
+ {t:'Места',zh:'商店',py:'shāngdiàn',tr:'шан-дянь',ru:'магазин'},
+ /* вещи и еда */
+ {t:'Вещи и еда',zh:'手机',py:'shǒujī',tr:'шоу-цзи',ru:'телефон'},
+ {t:'Вещи и еда',zh:'电话',py:'diànhuà',tr:'дянь-хуа',ru:'телефон (домашний)'},
+ {t:'Вещи и еда',zh:'号码',py:'hàomǎ',tr:'хао-ма',ru:'номер'},
+ {t:'Вещи и еда',zh:'苹果',py:'píngguǒ',tr:'пин-го',ru:'яблоко'},
+ {t:'Вещи и еда',zh:'蛋糕',py:'dàngāo',tr:'дань-гао',ru:'торт'},
+ {t:'Вещи и еда',zh:'火锅',py:'huǒguō',tr:'хо-го',ru:'хого (китайский котёл)'},
+ {t:'Вещи и еда',zh:'包子',py:'bāozi',tr:'бао-цзы',ru:'баоцзы (булочки)'},
+ {t:'Вещи и еда',zh:'杯子',py:'bēizi',tr:'бэй-цзы',ru:'кружка'},
+ {t:'Вещи и еда',zh:'恐龙',py:'kǒnglóng',tr:'кун-лун',ru:'динозавр'},
+ {t:'Вещи и еда',zh:'鱼',py:'yú',tr:'юй',ru:'рыба'},
+ {t:'Вещи и еда',zh:'时间',py:'shíjiān',tr:'ши-цзянь',ru:'время'},
+ {t:'Вещи и еда',zh:'手',py:'shǒu',tr:'шоу',ru:'рука'},
+ /* шахматы */
+ {t:'Шахматы',zh:'下棋',py:'xià qí',tr:'ся ци',ru:'играть в шахматы'},
+ {t:'Шахматы',zh:'王',py:'wáng',tr:'ван',ru:'король'},
+ {t:'Шахматы',zh:'马',py:'mǎ',tr:'ма',ru:'конь, лошадь'},
+ {t:'Шахматы',zh:'象',py:'xiàng',tr:'сян',ru:'слон'},
+ {t:'Шахматы',zh:'兵',py:'bīng',tr:'бин',ru:'пешка'},
+ {t:'Шахматы',zh:'走',py:'zǒu',tr:'цзоу',ru:'идти, ходить'},
+ {t:'Шахматы',zh:'吃',py:'chī',tr:'чши',ru:'есть, кушать'}
+];
+
+/* ============== ЗВУК ============== */
+var VOICE=null, HAS_ZH=false, AUDIO_ON=false;
+function pickVoice(){
+  if(!window.speechSynthesis) return;
+  var v=speechSynthesis.getVoices(); if(!v.length) return;
+  VOICE=null;
+  for(var i=0;i<v.length;i++){ if(/云夏|Yunxia/i.test(v[i].name)){VOICE=v[i];break;} }
+  if(!VOICE) for(var i=0;i<v.length;i++){ if(/晓晓|Xiaoxiao/i.test(v[i].name)){VOICE=v[i];break;} }
+  if(!VOICE) for(var i=0;i<v.length;i++){ if(/zh[-_]CN/i.test(v[i].lang)){VOICE=v[i];break;} }
+  if(!VOICE) for(var i=0;i<v.length;i++){ if(/^zh/i.test(v[i].lang)){VOICE=v[i];break;} }
+  HAS_ZH=!!VOICE;
+  if(HAS_ZH) document.getElementById('warn').className='warn';
+}
+function checkVoice(){ pickVoice(); if(!HAS_ZH) document.getElementById('warn').className='warn show'; }
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+setTimeout(checkVoice,1500); setTimeout(checkVoice,4000);
+['pointerdown','keydown','touchstart'].forEach(function(e){
+  document.addEventListener(e,function(){ AUDIO_ON=true; },{once:true});
+});
+function speak(t){
+  if(!window.speechSynthesis||!AUDIO_ON) return;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(String(t).replace(/[。？！、：]/g,' '));
+    u.lang='zh-CN'; u.rate=0.72; u.pitch=1.05;
+    if(VOICE) u.voice=VOICE;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+var AC=null;
+function beep(f,d,t){
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    var o=AC.createOscillator(),g=AC.createGain();
+    o.type=t||'sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(.13,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
+    o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d);
+  }catch(e){}
+}
+function sOK(){ beep(660,.12); setTimeout(function(){beep(880,.16);},100); }
+function sNO(){ beep(190,.22,'triangle'); }
+function sWIN(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){beep(f,.2);},i*95); }); }
+
+function $(id){ return document.getElementById(id); }
+function shuffle(a){ return a.slice().sort(function(){ return Math.random()-0.5; }); }
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function el(t,c,h){ var e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; }
+function confetti(){
+  var box=el('div','conf'); document.body.appendChild(box);
+  var cols=['#2f8f6a','#d99a2b','#3a6fa8','#c04a35','#7a6bb5'];
+  for(var i=0;i<55;i++){
+    var p=el('i');
+    p.style.left=Math.random()*100+'vw'; p.style.top=(-10-Math.random()*15)+'vh';
+    p.style.background=rnd(cols); p.style.animationDelay=(Math.random()*.6)+'s';
+    box.appendChild(p);
+  }
+  setTimeout(function(){ box.remove(); },3200);
+}
+function spkBtn(text){
+  var b=el('button','spk','🔊');
+  b.onclick=function(ev){ ev.stopPropagation(); speak(text); };
+  return b;
+}
+
+/* ============== «УМ» ТРЕНАЖЁРА ============== */
+/* каждому слову: box 0..3 (уровень), правильных подряд, число показов */
+W.forEach(function(w,i){ w.id=i; w.box=0; w.run=0; w.seen=0; });
+var STREAK=0, BEST=0;
+
+function weight(w){
+  /* чем ниже уровень и чем больше ошибок — тем выше шанс показа */
+  if(w.box===0) return 6;
+  if(w.box===1) return 4;
+  if(w.box===2) return 2;
+  return 1;
+}
+function pickWord(pool){
+  var bag=[];
+  pool.forEach(function(w){
+    var n=weight(w);
+    for(var i=0;i<n;i++) bag.push(w);
+  });
+  return rnd(bag);
+}
+function right(w){
+  w.run++; w.seen++;
+  if(w.run>=2 && w.box<3) { w.box++; w.run=0; }
+  STREAK++; if(STREAK>BEST) BEST=STREAK;
+  stats();
+}
+function wrong(w){
+  w.run=0; w.seen++;
+  if(w.box>0) w.box--;
+  STREAK=0;
+  stats();
+}
+function stats(){
+  var b3=0,b2=0,b1=0;
+  W.forEach(function(w){
+    if(w.box>=3) b3++;
+    else if(w.box===2) b2++;
+    else b1++;
+  });
+  var n=W.length;
+  $('b3').style.width=(b3/n*100)+'%';
+  $('b2').style.width=(b2/n*100)+'%';
+  $('b1').style.width=(b1/n*100)+'%';
+  $('tot').innerHTML='Выучено отлично: <b>'+b3+'</b> из '+n+' слов';
+  $('streak').textContent = STREAK>1 ? ('🔥 Подряд без ошибок: '+STREAK+(BEST>STREAK?(' · рекорд '+BEST):'')) : (BEST>1?('Рекорд подряд: '+BEST):'');
+}
+
+/* фильтр по темам */
+var THEMES=[]; W.forEach(function(w){ if(THEMES.indexOf(w.t)<0) THEMES.push(w.t); });
+var activeTheme='Все';
+function pool(){
+  if(activeTheme==='Все') return W;
+  return W.filter(function(w){ return w.t===activeTheme; });
+}
+function themeChips(onChange){
+  var box=el('div','chips');
+  function mk(name,count){
+    var c=el('div','chip'+(activeTheme===name?' on':''), name+'<span class="n">'+count+'</span>');
+    c.onclick=function(){ activeTheme=name; onChange(); };
+    return c;
+  }
+  box.appendChild(mk('Все', W.length));
+  THEMES.forEach(function(t){
+    box.appendChild(mk(t, W.filter(function(w){ return w.t===t; }).length));
+  });
+  return box;
+}
+
+/* ============== РЕЖИМЫ ============== */
+var MODES=[
+  {id:'learn', ic:'🎴', name:'Карточки'},
+  {id:'listen',ic:'👂', name:'Слушай'},
+  {id:'ru2zh', ic:'🇷🇺', name:'Как сказать'},
+  {id:'zh2ru', ic:'🇨🇳', name:'Что значит'},
+  {id:'list',  ic:'📚', name:'Все слова'}
+];
+var mode='learn';
+(function(){
+  var box=$('modes');
+  MODES.forEach(function(m){
+    var b=el('button','mode'+(m.id===mode?' on':''),'<span class="ic">'+m.ic+'</span>'+m.name);
+    b.onclick=function(){
+      mode=m.id;
+      for(var i=0;i<box.children.length;i++) box.children[i].className='mode';
+      b.className='mode on';
+      render();
+    };
+    box.appendChild(b);
+  });
+})();
+
+function render(){
+  var p=$('pane'); p.innerHTML='';
+  if(mode==='learn') p.appendChild(viewLearn());
+  else if(mode==='list') p.appendChild(viewList());
+  else p.appendChild(viewQuiz(mode));
+  stats();
+}
+
+/* --- режим 1: карточки с самопроверкой --- */
+function viewLearn(){
+  var box=el('div','box');
+  box.appendChild(el('div','h','🎴 Карточки — смотри, слушай, повторяй'));
+  box.appendChild(el('div','sub','Панда покажет слово. Скажи вслух, что оно значит, потом проверь себя.'));
+  box.appendChild(themeChips(render));
+
+  var cur=pickWord(pool());
+  var card=el('div','word');
+  var showBtn=el('button','big','👀 Показать ответ');
+  var rowW=el('div','row');
+  var msg=el('div','msg','&nbsp;');
+
+  function draw(revealed){
+    card.innerHTML=
+      '<div class="lvl">'+['🔴 новое','🟠 учим','🟡 почти','🟢 знаю'][cur.box]+'</div>'+
+      '<div class="hz zh">'+cur.zh+'</div>'+
+      '<div class="pn">'+cur.py+'</div>'+
+      '<div class="tr">«'+cur.tr+'»</div>'+
+      (revealed ? '<div class="ru">'+cur.ru+'</div>' : '<div class="hint">Скажи вслух, что это значит</div>');
+    card.appendChild(spkBtn(cur.zh));
+  }
+  function next(){
+    cur=pickWord(pool());
+    draw(false);
+    showBtn.style.display='block';
+    rowW.style.display='none';
+    msg.innerHTML='&nbsp;'; msg.className='msg';
+    speak(cur.zh);
+  }
+  showBtn.onclick=function(){
+    draw(true);
+    speak(cur.zh);
+    showBtn.style.display='none';
+    rowW.style.display='flex';
+  };
+  var ok=el('button','btn','✅ Знал');
+  var no=el('button','btn red','🤔 Не знал');
+  ok.onclick=function(){ right(cur); sOK(); msg.className='msg good'; msg.textContent='Отлично! 太棒了'; setTimeout(next,900); };
+  no.onclick=function(){ wrong(cur); msg.className='msg bad'; msg.textContent='Ничего, повторим ещё раз: «'+cur.tr+'» — '+cur.ru; setTimeout(next,2200); };
+  rowW.append(ok,no);
+  rowW.style.display='none';
+
+  box.appendChild(card);
+  box.appendChild(showBtn);
+  box.appendChild(rowW);
+  box.appendChild(msg);
+
+  var d=el('details','mom','<summary>Для мамы: как помочь</summary>');
+  d.appendChild(el('div','in',
+    '<p><b>Как делать:</b> прочитайте вслух русскую транскрипцию в кавычках, нажмите 🔊, пусть Аскар повторит. Потом спросите: «что это значит?» — и только после его ответа нажимайте «Показать ответ».</p>'+
+    '<p><b>Кнопки «Знал» / «Не знал» — честно.</b> Именно от них зависит, что тренажёр покажет дальше. Если нажимать «Знал» просто так, трудные слова перестанут повторяться.</p>'+
+    '<p><b>Значок вверху карточки</b> показывает, насколько слово усвоено: 🔴 новое → 🟠 учим → 🟡 почти → 🟢 знаю.</p>'));
+  box.appendChild(d);
+
+  draw(false);
+  setTimeout(function(){ speak(cur.zh); },400);
+  return box;
+}
+
+/* --- режимы 2-4: квизы --- */
+function viewQuiz(kind){
+  var box=el('div','box');
+  var titles={
+    listen:['👂 Слушай и выбирай','Панда произносит слово — найди его среди трёх.'],
+    ru2zh: ['🇷🇺 Как сказать по-китайски','Дано слово по-русски — выбери верный китайский вариант.'],
+    zh2ru: ['🇨🇳 Что значит это слово','Дан китайский — выбери, что он означает.']
+  };
+  box.appendChild(el('div','h',titles[kind][0]));
+  box.appendChild(el('div','sub',titles[kind][1]));
+  box.appendChild(themeChips(render));
+
+  var qb=el('div','word');
+  var playBtn=el('button','big blue','🔊 Слушать ещё раз');
+  var opts=el('div','opts');
+  var msg=el('div','msg','&nbsp;');
+  var cur=null, lock=false;
+
+  function next(){
+    lock=false;
+    var p=pool();
+    if(p.length<3){ qb.innerHTML='<div class="ru">В этой теме мало слов — выбери «Все»</div>'; opts.innerHTML=''; return; }
+    cur=pickWord(p);
+    var others=shuffle(p.filter(function(w){ return w.zh!==cur.zh; })).slice(0,2);
+    var all=shuffle(others.concat([cur]));
+
+    if(kind==='listen'){
+      qb.innerHTML='<div class="hz">🔊</div><div class="hint">Нажми и послушай, потом выбери</div>';
+      playBtn.style.display='block';
+    } else if(kind==='ru2zh'){
+      qb.innerHTML='<div class="ru" style="font-size:1.6rem">'+cur.ru+'</div><div class="hint">Как это по-китайски?</div>';
+      playBtn.style.display='none';
+    } else {
+      qb.innerHTML='<div class="hz zh">'+cur.zh+'</div><div class="pn">'+cur.py+'</div><div class="tr">«'+cur.tr+'»</div>';
+      playBtn.style.display='block';
+    }
+
+    opts.innerHTML='';
+    all.forEach(function(w){
+      var html;
+      if(kind==='zh2ru') html='<span class="ru">'+w.ru+'</span>';
+      else html='<span class="hz zh">'+w.zh+'</span><span class="pn">'+w.py+'</span><span class="tr">«'+w.tr+'»</span>';
+      var b=el('button','opt',html);
+      b.appendChild(spkBtn(w.zh));
+      b.onclick=function(){ answer(b,w); };
+      opts.appendChild(b);
+    });
+    msg.className='msg'; msg.innerHTML='&nbsp;';
+    if(kind!=='ru2zh') setTimeout(function(){ speak(cur.zh); },350);
+  }
+  function answer(b,w){
+    if(lock) return; lock=true;
+    if(w.zh===cur.zh){
+      b.className='opt ok'; sOK(); right(cur); speak(cur.zh);
+      msg.className='msg good';
+      msg.textContent='Верно! '+cur.zh+' — «'+cur.tr+'» — '+cur.ru+'. Повтори вслух!';
+      if(STREAK>0 && STREAK%10===0){ sWIN(); confetti(); }
+      setTimeout(next,2100);
+    } else {
+      b.className='opt no'; sNO(); wrong(cur); speak(cur.zh);
+      msg.className='msg bad';
+      msg.textContent='Правильно: '+cur.zh+' ('+cur.py+', «'+cur.tr+'») — '+cur.ru;
+      for(var k=0;k<opts.children.length;k++){
+        if(opts.children[k].textContent.indexOf(cur.zh)>=0 || opts.children[k].textContent.indexOf(cur.ru)>=0)
+          opts.children[k].className='opt ok';
+      }
+      setTimeout(next,3000);
+    }
+  }
+  playBtn.onclick=function(){ if(cur) speak(cur.zh); };
+
+  box.appendChild(qb);
+  box.appendChild(playBtn);
+  box.appendChild(opts);
+  box.appendChild(msg);
+
+  var d=el('details','mom','<summary>Для мамы: как помочь</summary>');
+  var txt = kind==='listen'
+    ? '<p><b>Это главное упражнение.</b> Аскар не читает иероглифы, поэтому выбирает только на слух. Нажмите 🔊 у каждого варианта по очереди, чтобы он услышал все три, и лишь потом пусть выбирает.</p>'
+    : kind==='ru2zh'
+    ? '<p><b>Самое трудное упражнение:</b> нужно вспомнить китайское слово самому. Дайте Аскару сказать вслух прежде, чем нажимать. Если молчит — прочитайте варианты по транскрипции в кавычках.</p>'
+    : '<p><b>Проверка понимания.</b> Прочитайте китайское слово вслух по транскрипции, а Аскар пусть скажет, что оно значит, и только потом нажмёт.</p>';
+  d.appendChild(el('div','in', txt+'<p>Каждая ошибка возвращает слово на уровень назад — оно будет встречаться чаще, пока не закрепится. Это нормально и так задумано.</p>'));
+  box.appendChild(d);
+
+  next();
+  return box;
+}
+
+/* --- режим 5: список всех слов --- */
+function viewList(){
+  var box=el('div','box');
+  box.appendChild(el('div','h','📚 Все слова'));
+  box.appendChild(el('div','sub','Нажми 🔊 у любого слова. Цветная точка — насколько оно выучено.'));
+  box.appendChild(themeChips(render));
+  var list=el('div','list');
+  var cols=['var(--cin)','var(--cin)','var(--gold)','var(--jade)'];
+  pool().forEach(function(w){
+    var li=el('div','li');
+    var dot=el('div','dot'); dot.style.background=cols[w.box];
+    var mid=el('div','mid','<div class="pn">'+w.py+' <span class="tr">«'+w.tr+'»</span></div><div class="ru">'+w.ru+'</div>');
+    var hz=el('div','hz zh',w.zh);
+    var b=el('button',null,'🔊'); b.onclick=function(){ speak(w.zh); };
+    li.append(dot,hz,mid,b);
+    list.appendChild(li);
+  });
+  box.appendChild(list);
+  var d=el('details','mom','<summary>Для мамы: как помочь</summary>');
+  d.appendChild(el('div','in',
+    '<p>Здесь собраны все слова, которые Аскар прошёл за оба абонемента — более ста.</p>'+
+    '<p><b>Красная точка</b> — слово пока не закрепилось, <b>жёлтая</b> — почти выучено, <b>зелёная</b> — знает уверенно. Можно просто листать и слушать, это тоже полезно.</p>'));
+  box.appendChild(d);
+  return box;
+}
+
+render();
+</script>
+</body>
+</html>
